@@ -8,7 +8,33 @@ date: 2016-05-30
 
 #### Drag
 
-先构造一个界面
+先构造
 
+界面
 
 ![preview](/img/Blog/20160530163146.png)
+
+架构
+![struct](/img/Blog/20160530164647.png)
+
+创建一个Drag函数。
+
+{% highlight c++ %}
+
+using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.EventSystems;
+using UnityEngine.UI;
+[RequireComponent(typeof(Image))]
+public class Drag : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler
+{
+    public bool dragOnSurfaces = true;
+
+    private Dictionary<int,GameObject> m_DraggingIcons = new Dictionary<int, GameObject>();
+    private Dictionary<int, RectTransform> m_DraggingPlanes = new Dictionary<int, RectTransform>();
+
+    public Sprite noneSprite;
+
+}
+
+{% endhighlight %}
