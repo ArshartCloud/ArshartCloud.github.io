@@ -168,3 +168,101 @@ public class Drop : MonoBehaviour, IDropHandler, IPointerEnterHandler, IPointerE
 }
 
 {% endhighlight %}
+
+接口同样对应了：开始，中途，结束。
+
+在Drop的时候，需要考虑两种情况：  
+1. 如果Drop的对象本身是空白，则将Drag的来源图像赋给Drop的对象，并将Drag的来源图像置空。（实现移动）
+2. 如果Drop的对象本身有图片，则将Drag的来源与Drop的对象交换。
+
+代码如下：  
+
+{% highlight c++ %}
+
+using System.Reflection;
+using UnityEngine;
+using UnityEngine.EventSystems;
+using UnityEngine.UI;
+
+[RequireComponent(typeof(Image))]
+public class Drop : MonoBehaviour, IDropHandler, IPointerEnterHandler, IPointerExitHandler
+{
+    public Image containerImage;
+    public Image receivingImage;
+    public Sprite noneSprite;
+    private Color normalColor;
+    public Color highlightColor = Color.yellow;
+
+    public void OnEnable()
+    {
+        if (containerImage != null)
+            normalColor = containerImage.color;
+    }
+
+    public void OnDrop(PointerEventData data)
+    {
+        containerImage.color = normalColor;
+
+        if (receivingImage == null)
+            return;
+
+        Sprite dropSprite = GetDropSprite(data);
+        if (dropSprite != null)
+        {
+            var originalObj = data.pointerDrag;
+            if (receivingImage.sprite.Equals(noneSprite))
+            {
+                if (originalObj != null)
+                {
+                    originalObj.GetComponent<Image>().sprite = noneSprite;
+                    receivingImage.sprite = dropSprite;
+                }
+
+            }
+            else
+            {
+                originalObj.GetComponent<Image>().sprite = receivingImage.sprite;
+                receivingImage.sprite = dropSprite;
+            }
+
+        }
+    }
+
+    public void OnPointerEnter(PointerEventData data)
+    {
+        if (containerImage == null)
+            return;
+
+        Sprite dropSprite = GetDropSprite(data);
+        if (dropSprite != null)
+            containerImage.color = highlightColor;
+    }
+
+    public void OnPointerExit(PointerEventData data)
+    {
+        if (containerImage == null)
+            return;
+
+        containerImage.color = normalColor;
+    }
+
+    private Sprite GetDropSprite(PointerEventData data)
+    {
+        var originalObj = data.pointerDrag;
+        if (originalObj == null)
+            return null;
+
+        var dragMe = originalObj.GetComponent<Drag>();
+        if (dragMe == null)
+            return null;
+
+        var srcImage = originalObj.GetComponent<Image>();
+        if (srcImage == null)
+            return null;
+
+        return srcImage.sprite;
+    }
+}
+
+
+{% endhighlight %}
