@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "JUC Deck Predict"
+title: "JUG Deck Predict"
 date: 2017-04-01
 ---
 
